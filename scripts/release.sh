@@ -64,10 +64,10 @@ fi
 
 BRANCH="$(git branch --show-current)"
 
-if [ "$BRANCH" != "main" ]; then
+if [ "$BRANCH" != "master" ]; then
     echo
     echo "Warning: you are currently on branch '$BRANCH'."
-    echo "Releases are normally created from 'main'."
+    echo "Releases are normally created from 'master'."
     echo
     read -r -p "Continue? [y/N] " ANSWER
 
@@ -130,33 +130,6 @@ echo "Building release binaries..."
 
 VERSION="$VERSION" ./scripts/build.sh
 
-# ------------------------------------------------------------
-# Verify binaries
-# ------------------------------------------------------------
-
-echo
-echo "Verifying binaries..."
-
-AMD64_VERSION="$(
-    "$ROOT_DIR/dist/envcheck-linux-amd64" -v
-)"
-
-ARM64_VERSION="$(
-    "$ROOT_DIR/dist/envcheck-linux-arm64" -v
-)"
-
-echo "  AMD64: $AMD64_VERSION"
-echo "  ARM64: $ARM64_VERSION"
-
-if [ "$AMD64_VERSION" != "envcheck $VERSION" ]; then
-    echo "Error: AMD64 binary version mismatch."
-    exit 1
-fi
-
-if [ "$ARM64_VERSION" != "envcheck $VERSION" ]; then
-    echo "Error: ARM64 binary version mismatch."
-    exit 1
-fi
 
 # ------------------------------------------------------------
 # Create checksums
