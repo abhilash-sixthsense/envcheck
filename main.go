@@ -34,12 +34,12 @@ type Config struct {
 }
 
 type EnvEntry struct {
-	Key         string
-	Value       string
-	HasValue    bool
-	Comments    []string
-	LineNumber  int
-	Raw         string
+	Key        string
+	Value      string
+	HasValue   bool
+	Comments   []string
+	LineNumber int
+	Raw        string
 }
 
 type EnvState int
@@ -51,19 +51,19 @@ const (
 )
 
 type ProjectResult struct {
-	Path          string
-	Missing       []EnvEntry
-	Unconfigured  []EnvEntry
-	Configured    []EnvEntry
-	Skipped       bool
+	Path         string
+	Missing      []EnvEntry
+	Unconfigured []EnvEntry
+	Configured   []EnvEntry
+	Skipped      bool
 }
 
 func main() {
 	config := parseFlags()
 
 	if config.dir == "" {
-	    printUsage()
-	    return
+		printUsage()
+		return
 	}
 
 	if config.version {
