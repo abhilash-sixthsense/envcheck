@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: '1.27'
+
+      - name: Test
+        run: go test ./...
+
+      - name: Build Linux AMD64
+        env:
+          CGO_ENABLED: 0
+          GOOS: linux
+          GOARCH: amd64
+        run: |
+          mkdir -p dist
+          go build \
+            -trimpath \
+            -ldflags="-s -w" \
+            -o dist/envcheck-linux-amd64 .
+
+      - name: Build Linux ARM64
+        env:
+          CGO_ENABLED: 0
+          GOOS: linux
+          GOARCH: arm64
+        run: |
+          mkdir -p dist
+          go build \
+            -trimpath \
+            -ldflags="-s -w" \
+            -o dist/envcheck-linux-arm64 .
+
+      - name: Create checksums
+        run: |
+          cd dist
+          sha256sum envcheck-linux-amd64 > checksums.txt
+          sha256sum envcheck-linux-arm64 >> checksums.txt
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/envcheck-linux-amd64 \
+            dist/envcheck-linux-arm64 \
+            dist/checksums.txt \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes
